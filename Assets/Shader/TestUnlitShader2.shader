@@ -19,12 +19,14 @@
 			struct appdata
 			{
 				float4 vertex1:POSITION;
+				float2 uv:TEXCOORD;
 			};
 
 			//顶点着色器传递给片元着色器的结构体(返回值)
 			struct v2f
 			{
 				float4 pos:SV_POSITION;
+				float2 uv:TEXCOORD;
 			};
 
 			//对于一个三角形,顶点着色器只会执行3次(3个顶点)
@@ -32,16 +34,27 @@
 			{
 				v2f o;
 				o.pos=UnityObjectToClipPos(v.vertex1);
+				o.uv=v.uv;
 				return o;
 			}
 
-			
+			fixed checker(float2 uv)
+            {
+                float2 repeatUV=uv*10;
+                float2 c=floor(repeatUV)/2;
+                float checker=frac(c.x+c.y)*2;
+                return checker;
+            }
 
 			//同样对于一个三角形,像素/片段/片元着色器可能执行上千次(和有多少像素有关)
-			float4 frag():SV_TARGET
+			fixed4 frag(v2f param):SV_TARGET
 			{
-				return _Color1;
+			    fixed col=checker(param.uv);
+				return col;
 			}
+
+
+
 			ENDCG
 		}
 	}
